@@ -2,7 +2,7 @@
 , stdenv
 , fetchurl
 , fetchpatch2
-, autoreconfHook
+, cmake
 , pkg-config
 , installShellFiles
 , util-linux
@@ -34,26 +34,17 @@ let
 in
 stdenv.mkDerivation rec {
   pname = if withGui then "bitcoin" else "bitcoind";
-  version = "27.1";
+  version = "67b1e236334f38ec4e4d2251dbdfb790f20ed88b";
 
   src = fetchurl {
     urls = [
-      "https://bitcoincore.org/bin/bitcoin-core-${version}/bitcoin-${version}.tar.gz"
+      "https://github.com/hebasto/bitcoin/archive/${version}.tar.gz"
     ];
-    # hash retrieved from signed SHA256SUMS
-    sha256 = "0c1051fd921b8fae912f5c2dfd86b085ab45baa05cd7be4585b10b4d1818f3da";
+    sha256 = "sha256-z00kvQ/TrNxn/9LO8ow6UOuXdHuLfAMvb/3C78An6co=";
   };
 
-  patches = [
-    # upnp: fix build with miniupnpc 2.2.8
-    (fetchpatch2 {
-      url = "https://github.com/bitcoin/bitcoin/commit/8acdf66540834b9f9cf28f16d389e8b6a48516d5.patch?full_index=1";
-      hash = "sha256-oDvHUvwAEp0LJCf6QBESn38Bu359TcPpLhvuLX3sm6M=";
-    })
-  ];
-
   nativeBuildInputs =
-    [ autoreconfHook pkg-config installShellFiles ]
+    [ cmake pkg-config installShellFiles ]
     ++ lib.optionals stdenv.isLinux [ util-linux ]
     ++ lib.optionals stdenv.isDarwin [ hexdump ]
     ++ lib.optionals (stdenv.isDarwin && stdenv.isAarch64) [ autoSignDarwinBinariesHook ]
@@ -65,22 +56,24 @@ stdenv.mkDerivation rec {
     ++ lib.optionals (withWallet && !stdenv.isDarwin) [ db48 ]
     ++ lib.optionals withGui [ qrencode qtbase qttools ];
 
+  # this only works with release sources, not GitHub commits
+  # disable for now
   postInstall = ''
-    installShellCompletion --bash contrib/completions/bash/bitcoin-cli.bash
-    installShellCompletion --bash contrib/completions/bash/bitcoind.bash
-    installShellCompletion --bash contrib/completions/bash/bitcoin-tx.bash
+    # installShellCompletion --bash contrib/completions/bash/bitcoin-cli.bash
+    # installShellCompletion --bash contrib/completions/bash/bitcoind.bash
+    # installShellCompletion --bash contrib/completions/bash/bitcoin-tx.bash
 
-    installShellCompletion --fish contrib/completions/fish/bitcoin-cli.fish
-    installShellCompletion --fish contrib/completions/fish/bitcoind.fish
-    installShellCompletion --fish contrib/completions/fish/bitcoin-tx.fish
-    installShellCompletion --fish contrib/completions/fish/bitcoin-util.fish
-    installShellCompletion --fish contrib/completions/fish/bitcoin-wallet.fish
+    # installShellCompletion --fish contrib/completions/fish/bitcoin-cli.fish
+    # installShellCompletion --fish contrib/completions/fish/bitcoind.fish
+    # installShellCompletion --fish contrib/completions/fish/bitcoin-tx.fish
+    # installShellCompletion --fish contrib/completions/fish/bitcoin-util.fish
+    # installShellCompletion --fish contrib/completions/fish/bitcoin-wallet.fish
   '' + lib.optionalString withGui ''
-    installShellCompletion --fish contrib/completions/fish/bitcoin-qt.fish
+    # installShellCompletion --fish contrib/completions/fish/bitcoin-qt.fish
 
-    install -Dm644 ${desktop} $out/share/applications/bitcoin-qt.desktop
-    substituteInPlace $out/share/applications/bitcoin-qt.desktop --replace "Icon=bitcoin128" "Icon=bitcoin"
-    install -Dm644 share/pixmaps/bitcoin256.png $out/share/pixmaps/bitcoin.png
+    # install -Dm644 ${desktop} $out/share/applications/bitcoin-qt.desktop
+    # substituteInPlace $out/share/applications/bitcoin-qt.desktop --replace "Icon=bitcoin128" "Icon=bitcoin"
+    # install -Dm644 share/pixmaps/bitcoin256.png $out/share/pixmaps/bitcoin.png
   '';
 
   preConfigure = lib.optionalString stdenv.isDarwin ''
