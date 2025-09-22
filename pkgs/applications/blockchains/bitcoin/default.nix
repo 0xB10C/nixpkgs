@@ -16,6 +16,7 @@
   sqlite,
   qrencode,
   libsystemtap,
+  capnproto,
   qtbase ? null,
   qttools ? null,
   python3,
@@ -29,7 +30,7 @@
   # The list can be found at https://github.com/bitcoin-core/guix.sigs/tree/main/builder-keys
   builderKeys ? [
     "152812300785C96444D3334D17565732E08E5E41" # achow101.gpg
-    "9EDAFF80E080659604F4A76B2EBB056FD847F8A7" # Emzy.gpg
+    #"9EDAFF80E080659604F4A76B2EBB056FD847F8A7" # Emzy.gpg
     "71A3B16735405025D447E8F274810B012346C9A6" # laanwj.gpg
     "6B002C6EA3F91B1B0DF0C9BC8F617F1200A6D25C" # glozow.gpg
     "D1DBF2C4B96F2DEBF4C16654410108112E7EA81F" # hebasto.gpg
@@ -45,14 +46,15 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = if withGui then "bitcoin" else "bitcoind";
-  version = "29.1";
+  version = "30.0rc1";
 
   src = fetchurl {
     urls = [
-      "https://bitcoincore.org/bin/bitcoin-core-${finalAttrs.version}/bitcoin-${finalAttrs.version}.tar.gz"
-    ];
+        #"https://bitcoincore.org/bin/bitcoin-core-${finalAttrs.version}/bitcoin-${finalAttrs.version}.tar.gz"
+        "https://bitcoincore.org/bin/bitcoin-core-30.0/test.rc1/bitcoin-${finalAttrs.version}.tar.gz"
+      ];
     # hash retrieved from signed SHA256SUMS
-    sha256 = "067f624ae273b0d85a1554ffd7c098923351a647204e67034df6cc1dfacfa06b";
+    sha256 = "ef6a60137b5a5b36dd9ff55c1c7e66a8b3115cc866fdaa9198db3b3c4d889def";
   };
 
   nativeBuildInputs = [
@@ -71,6 +73,7 @@ stdenv.mkDerivation (finalAttrs: {
     libevent
     zeromq
     zlib
+    capnproto
   ]
   ++ lib.optionals enableTracing [ libsystemtap ]
   ++ lib.optionals withWallet [ sqlite ]
@@ -92,13 +95,13 @@ stdenv.mkDerivation (finalAttrs: {
       };
 
       checksums = fetchurl {
-        url = "https://bitcoincore.org/bin/bitcoin-core-${finalAttrs.version}/SHA256SUMS";
-        hash = "sha256-teQ02vm875Isks9sBC2HV3Zo78W+UkXGH9zgyNhOnQs=";
+        url = "https://bitcoincore.org/bin/bitcoin-core-30.0/test.rc1/SHA256SUMS";
+        hash = "sha256-AYGeq2av2nOnyKGJbe1yH9DK18lRF3+hbnIn6f2XVyM=";
       };
 
       signatures = fetchurl {
-        url = "https://bitcoincore.org/bin/bitcoin-core-${finalAttrs.version}/SHA256SUMS.asc";
-        hash = "sha256-hyk57QyGJnrjuuGRmvfOhVAx9Nru93e8bfah5fSVcmg=";
+        url = "https://bitcoincore.org/bin/bitcoin-core-30.0/test.rc1/SHA256SUMS.asc";
+        hash = "sha256-0iUeJsektAxubVluXm6i6A+1OJ/qzJUxWKjzMHw591U=";
       };
 
       verifyBuilderKeys =
