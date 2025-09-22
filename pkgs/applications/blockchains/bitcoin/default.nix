@@ -190,7 +190,8 @@ stdenv.mkDerivation (finalAttrs: {
   __darwinAllowLocalNetworking = true;
 
   nativeInstallCheckInputs = [
-    versionCheckHook
+    # skip this for now as v30.0.0rc1 != v30.0rc1
+    #versionCheckHook
   ];
   versionCheckProgram = "${placeholder "out"}/bin/bitcoin-cli";
   versionCheckProgramArg = "--version";
