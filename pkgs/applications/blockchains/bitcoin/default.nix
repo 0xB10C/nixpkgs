@@ -23,6 +23,7 @@
   nixosTests,
   withGui,
   withWallet ? true,
+  enableIPC ? true,
   enableTracing ? stdenv.hostPlatform.isLinux && !stdenv.hostPlatform.isStatic,
   gnupg,
   # Signatures from the following GPG public keys checked during verification of the source code.
@@ -151,6 +152,7 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     (lib.cmakeBool "BUILD_BENCH" false)
     (lib.cmakeBool "WITH_ZMQ" true)
+    (lib.cmakeBool "ENABLE_IPC" enableIPC)
     (lib.cmakeBool "WITH_USDT" enableTracing)
   ]
   ++ lib.optionals (!finalAttrs.doCheck) [
